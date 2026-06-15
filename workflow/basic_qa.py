@@ -18,23 +18,27 @@ class BasicQAAgentState(TypedDict):
 
 
 def router_next(state: BasicQAAgentState):
+    """路由函数：判断是否需要重新生成答案"""
     need_revise = state['need_revise']
     if need_revise:
         return "generate_answer"
     else:
-        END
+        return END
 
 
 def build_workflow():
     workflow = StateGraph(BasicQAAgentState)
 
-    workflow.add_node("check_answer", check_answer_tool)
     workflow.add_node("generate_answer", generate_answer_tool)
+    workflow.add_node("check_answer", check_answer_tool)
 
-    workflow.set_entry_point("check_answer")
+    # 入口点：先生成答案
+    workflow.set_entry_point("generate_answer")
 
-    workflow.add_edge("check_answer", "generate_answer")
+    # 生成答案 -> 校验答案
+    workflow.add_edge("generate_answer", "check_answer")
 
+    # 校验答案 -> 根据结果决定下一步
     workflow.add_conditional_edges(
         "check_answer",
         router_next,
@@ -46,7 +50,7 @@ def build_workflow():
 
     return workflow
 
+
 def get_compiled_workflow():
     workflow = build_workflow()
     return workflow.compile()
-
