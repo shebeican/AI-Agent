@@ -1,8 +1,8 @@
 from typing import TypedDict
 from langgraph.graph import StateGraph, END
 
-from tools.check_answer import check_answer_tool
-from tools.generate_answer import generate_answer_tool
+from tools.basic_qa.check_answer import check_answer_tool
+from tools.basic_qa.generate_answer import generate_answer_tool
 
 
 # 定义工作流状态结构
