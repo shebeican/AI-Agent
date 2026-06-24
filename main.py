@@ -4,7 +4,7 @@ from typing import List
 
 from langchain_core.messages import HumanMessage
 
-from workflow import basic_qa, math_calc, memory_chatbot, router_branch, parallel_task
+from workflow import basic_qa, math_calc, memory_chatbot, router_branch, parallel_task, subplot_nesting
 
 # 配置日志
 logging.basicConfig(
@@ -149,6 +149,31 @@ class ParallelTaskAgent:
 
         return result.get('summary', '执行失败')
 
+class SubplotNestingAgent:
+    """子图嵌套代理"""
+
+    def __init__(self, max_retries: int = 3):
+        """
+        初始化代理
+        :param max_retries 最大重试次数:
+        """
+        self.max_retries = max_retries
+        self.workflow = subplot_nesting.get_compiled_workflow()
+
+    def run(self, query: str):
+        """
+        执行用户问答
+        """
+        init_state = {
+            'user_query': query,
+            'budget_decomposition': '',
+            'requirement_decomposition': '',
+            'result': '',
+        }
+        result = self.workflow.invoke(init_state)
+
+        return result.get('result', '执行失败')
+
 def main():
     # ================================================
     #                 基础对话Agent
@@ -182,7 +207,13 @@ def main():
     # ================================================
     #                 并行任务Agent
     # ================================================
-    agent = ParallelTaskAgent()
+    # agent = ParallelTaskAgent()
+    # print(agent.run(query="python的装饰器如何使用"))
+
+    # ================================================
+    #                 子图嵌套Agent
+    # ================================================
+    agent = SubplotNestingAgent()
     print(agent.run(query="python的装饰器如何使用"))
 
 if __name__ == '__main__':

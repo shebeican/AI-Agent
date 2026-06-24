@@ -107,4 +107,5 @@ class XfAstronClient:
 # 全局单例实例
 xf_astron = XfAstronClient(
     api_key=settings.XF_API_KEY,
+    timeout=300  # 增加超时时间到120秒
 )
